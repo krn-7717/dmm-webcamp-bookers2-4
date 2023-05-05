@@ -5,34 +5,60 @@
       <%= render "new", book: @book %>
     </div>
     <div class="col-md-8 offset-md-1">
-    <h2>Book detail</h2>
-    <table class="table">
-        <tbody>
-          <tr>
-            <td>
-              <%= link_to user_path(@book_dil.user.id) do %>
-                <%= image_tag @book_dil.user.get_profile_image(100,100) %>
-                </br>
-                <%= @book_dil.user.name %>
+      <h2>Book detail</h2>
+      <table class="table">
+          <tbody>
+            <tr>
+              <td>
+                <%= link_to user_path(@book_dil.user.id) do %>
+                  <%= image_tag @book_dil.user.get_profile_image(100,100) %>
+                  </br>
+                  <%= @book_dil.user.name %>
+                <% end %>
+              </td>
+
+              <td><%= link_to @book_dil.title, book_path(@book_dil.id) %></td>
+
+              <td><%= @book_dil.body %></td>
+
+              <td><%= render "favorites/fav", book: @book_dil %></td>
+
+              <td>コメント数:<%= @book_dil.book_comments.count %></td>
+
+              <% if @book_dil.user == current_user %>
+                <td>
+                  <%= link_to "Edit", edit_book_path(@book_dil), class: "btn btn-sm btn-success" %>
+                </td>
+                <td>
+                  <%= link_to "Destroy", book_path(@book_dil), method: :delete, class: "btn btn-sm btn-danger" %>
+                </td>
               <% end %>
-            </td>
 
-            <td><%= link_to @book_dil.title, book_path(@book_dil.id) %></td>
-
-            <td><%= @book_dil.body %></td>
-
-            <% if @book_dil.user == current_user %>
-              <td>
-                <%= link_to "Edit", edit_book_path(@book_dil), class: "btn btn-sm btn-success" %>
-              </td>
-              <td>
-                <%= link_to "Destroy", book_path(@book_dil), method: :delete, class: "btn btn-sm btn-danger" %>
-              </td>
-            <% end %>
-
-          </tr>
-        </tbody>
-    </table>
+            </tr>
+          </tbody>
+      </table>
+      <ul>
+         <% @book_dil.book_comments.each do |comment| %>
+            <oi>
+              <%= image_tag comment.user.get_profile_image(64,64) %>
+                <div>
+                  <h5>
+                    <%= link_to comment.user.name, user_path(comment.user.id) %>
+                    <%= comment.comment %>
+                    <% if current_user == comment.user %>
+                        <%= link_to "Destroy", book_book_comment_path(comment.book.id, comment.id), method: :delete %>
+                    <% end %>
+                  </h5>
+                </div>
+            </oi>
+        <% end %>
+      </ul>
+      <%= form_with model: [@book_dil, @book_comment] do |f| %>
+        <div class="form-group">
+          <%= f.text_area :comment, class: "form-control" %>
+        </div>
+        <%= f.submit "送信", class: "btn btn-primary" %>
+      <% end %>
     </div>
   </div>
 </div>
